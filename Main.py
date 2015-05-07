@@ -63,8 +63,8 @@ def online_pred(clf, X_new):
     pred = clf.predict(X_new)
     #pred_proba = clf.predict_proba(X_new)
     counts = 0
-    #for i, label in enumerate(pred):
-    for label in pred:
+    for i, label in enumerate(pred):
+    #for label in pred:
         if label != 1 and label != 0:
             Warning('Wrong label')
         if label == 1:
@@ -86,6 +86,15 @@ def clf_test(i, j):
     print 'Training with data%d, test with data%d:' % (i, j)
     X_train, X_test, y_train, y_test = X[train_idx], X[test_idx], y[train_idx], y[test_idx]
     clf = LR(X_train, X_test, y_train, y_test)[1]
+#     if hasattr(clf, 'coef_'):
+#         #print("dimensionality: %d" % clf.coef_.shape[1])
+#         #print("density: %f" % density(clf.coef_))
+#         print("top 10 keywords per class:")
+#         top10 = np.argsort(clf.coef_)[0, -10:]
+#         print("\tHIV: %s" % (" ".join(map(str, feature_names[top10]))))
+#         tail10 = np.argsort(clf.coef_)[0, :10]
+#         print("\tNO HIV: %s" % (" ".join(map(str,feature_names[tail10]))))
+
     online_pred(clf, X_new)
     print '-'*30
     
@@ -98,18 +107,38 @@ if __name__ == '__main__':
     online_tweets = './Data/tweets_online.txt'         
     tweets_new = tweets_stream(online_tweets)[0]
         
-    X, X_new = to_feature(all_tweets, tweets_new)[:2]
+    #X, X_new = to_feature(all_tweets, tweets_new)[:2]
+    X, X_new, feature_names = to_feature(all_tweets, tweets_new)
     print 'Dictionary size: %d' % X.shape[1]
     print '-'*30
     
     y = labels
     y_new = np.array([0]*len(X_new))
     
+    print 'Training with data2 + 1/10 online data, test with data1 + 9/10 online data'
+    online_percent = len(X_new)/10
+    X_train, X_test = np.concatenate([X[data_idx[0]:data_idx[0]+data_idx[1]], X_new[:online_percent]]), X[:data_idx[0]]
+    y_train, y_test = np.concatenate([y[data_idx[0]:data_idx[0]+data_idx[1]], y_new[:online_percent]]), y[:data_idx[0]]
+    clf = LR(X_train, X_test, y_train, y_test)[1]
+    online_pred(clf, X_new)
+    print '-'*30
+    
     print 'Training with hiv data + 1/10 online data, test with 9/10 online data'
     online_percent = len(X_new)/10
     X_train, X_test = np.concatenate([X, X_new[:online_percent]]), X_new[online_percent:]
     y_train, y_test = np.concatenate([y, y_new[:online_percent]]), y_new[online_percent:]
     clf = LR(X_train, X_test, y_train, y_test)[1]
+    if hasattr(clf, 'coef_'):
+        #print("dimensionality: %d" % clf.coef_.shape[1])
+        #print("density: %f" % density(clf.coef_))
+        print("top 10 keywords per class:")
+        top10 = np.argsort(clf.coef_)[0, -10:]
+        print("\tHIV: %s" % (" ".join(map(str, feature_names[top10]))))
+        tail10 = np.argsort(clf.coef_)[0, :10]
+        print("\tNO HIV: %s" % (" ".join(map(str,feature_names[tail10]))))
+        coef_idx = np.argsort(clf.coef_)[0,::-1]
+        #np.savetxt('feature weight.txt', feature_names[coef_idx], delimiter='\n', fmt='%s') 
+        np.savetxt('feature weight.txt', feature_names[coef_idx], delimiter='\n', fmt='%s') 
     online_pred(clf, X_new)
     print '-'*30
     
