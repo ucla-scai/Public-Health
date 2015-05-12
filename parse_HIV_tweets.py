@@ -2,7 +2,7 @@ import sys
 import csv
 
 def parse_and_write(outfile_name):
-    with open('tweets/HIV_0001_1000.csv', 'rU') as infile:
+    with open('Data/tweets_0001_1000.csv', 'rU') as infile:
         hiv_reader = csv.reader(infile, delimiter=',')
         with open(outfile_name, 'wb') as outfile:
             hiv_writer = csv.writer(outfile, delimiter=',')
@@ -15,7 +15,7 @@ def parse_and_write(outfile_name):
                     row_vec = [row_in[9], row_in[28], row_in[39]] #use Sean's classification; 39th column
                     hiv_writer.writerow(row_vec)
     
-    with open('tweets/HIV_1001_5000.csv', 'rU') as infile:
+    with open('Data/tweets_1001_5000.csv', 'rU') as infile:
         hiv_reader = csv.reader(infile, delimiter=',')
         with open(outfile_name, 'a') as outfile:
             hiv_writer = csv.writer(outfile, delimiter=',')
@@ -27,7 +27,7 @@ def parse_and_write(outfile_name):
                     if(row_in[2] != ""): #ignore rows that are not classified
                         hiv_writer.writerow(row_in)
                         
-    with open('tweets/HIV_5001_7000.csv', 'rU') as infile:
+    with open('Data/tweets_5001_7000_sean.csv', 'rU') as infile:
         hiv_reader = csv.reader(infile, delimiter=',')
         with open(outfile_name, 'a') as outfile:
             hiv_writer = csv.writer(outfile, delimiter=',')

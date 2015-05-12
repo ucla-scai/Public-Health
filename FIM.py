@@ -1,3 +1,5 @@
+import re
+
 # encoding: utf-8
 
 """
@@ -386,6 +388,18 @@ class FPNode(object):
             return "<%s (root)>" % type(self).__name__
         return "<%s %r (%r)>" % (type(self).__name__, self.item, self.count)
 
+def filter_trans(bow_vec):
+    i=0
+    while (i < len(bow_vec)): 
+        word = bow_vec[i]
+        if word[0] == '#':
+            word = word[1:len(word)]
+            bow_vec[i] = word #remove hashtags
+        if re.match("^[a-zA-Z0-9_]*$", word):
+            i = i+1
+        else:
+            del bow_vec[i] #remove words with special characters
+    return bow_vec
 
 if __name__ == '__main__':
     from optparse import OptionParser
@@ -397,22 +411,47 @@ if __name__ == '__main__':
     p.set_defaults(minsup=20)
 
     options, args = p.parse_args()
+    
+    fin = open('Data/parsed_tweets.csv')
+    fout = open('Data/frequent_itemsets.txt', 'wb')
+    try:
+        tweets = csv.reader(fin, delimiter=',')
+        transactions = []
+        for tweet in tweets:
+            if(tweet[2]=='1'): #only scan HIV-related tweets
+                text = tweet[1]
+                new_trans = text.lower().split(' ')
+                new_trans = [item for item in new_trans if item not in stop_words.ENGLISH_STOP_WORDS and item not in ['I'] and len(item)>0]
+                new_trans = filter_trans(new_trans)
+                transactions.append(new_trans)
+        results = find_frequent_itemsets(transactions, options.minsup, True)
+        for itemset, support in results:
+            if len(itemset) > 1:
+                fout.write('{' + ', '.join(itemset) + '} ' + str(support) + '\n')
+                
+    finally:
+        fin.close()
+        fout.close()
+    
     #if len(args) < 1:
     #    p.error('must provide the path to a CSV file to read')
     #f = open(args[0])
-    f = open('word_transaction.txt')
-    try:
-        raw_transaction = csv.reader(f, delimiter=' ')
-        transactions = []
-        for trans in raw_transaction:
-            new_trans = [item for item in trans if item not in stop_words.ENGLISH_STOP_WORDS]
-            new_trans = [item for item in new_trans if item not in ['luckyegg', 'like','just', 'gay']]
-            transactions.append(new_trans)
-        
-        results = find_frequent_itemsets(transactions, options.minsup, True)
-        #sorted(results, key=lambda tup: tup[1])
-        for itemset, support in results:
-            if len(itemset) > 1:
-                print '{' + ', '.join(itemset) + '} ' + str(support)
-    finally:
-        f.close()
+    
+#     f = open('word_transaction.txt')
+#     try:
+#         raw_transaction = csv.reader(f, delimiter=' ')
+#         transactions = []
+#         for trans in raw_transaction:
+#             new_trans = [item for item in trans if item not in stop_words.ENGLISH_STOP_WORDS]
+#             new_trans = [item for item in new_trans if item not in ['luckyegg', 'like','just', 'gay']]
+#             transactions.append(new_trans)
+#          
+#         results = find_frequent_itemsets(transactions, options.minsup, True)
+#         #sorted(results, key=lambda tup: tup[1])
+#         for itemset, support in results:
+#             if len(itemset) > 1:
+#                 print '{' + ', '.join(itemset) + '} ' + str(support)
+#     finally:
+#         f.close()
+
+
