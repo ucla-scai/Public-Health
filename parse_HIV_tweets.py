@@ -39,6 +39,8 @@ def parse_and_write(outfile_name):
                     row_vec = [row_in[0], row_in[1], row_in[2]] #only retrieve id, text, hiv columns
                     hiv_writer.writerow(row_vec)
 
+
+
 if __name__ == "__main__":
     if len(sys.argv)>1:
         parse_and_write(sys.argv[1])

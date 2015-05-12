@@ -1,5 +1,3 @@
-import re
-
 # encoding: utf-8
 
 """
@@ -11,9 +9,11 @@ Basic usage of the module is very simple:
     >>> find_frequent_itemsets(transactions, minimum_support)
 """
 
+import re
 from collections import defaultdict, namedtuple
 from itertools import imap
 from sklearn.feature_extraction import stop_words
+from Tools2 import filter_bow
 
 __author__ = 'Eric Naeseth <eric@naeseth.com>'
 __copyright__ = 'Copyright 2009 Eric Naeseth'
@@ -388,19 +388,6 @@ class FPNode(object):
             return "<%s (root)>" % type(self).__name__
         return "<%s %r (%r)>" % (type(self).__name__, self.item, self.count)
 
-def filter_trans(bow_vec):
-    i=0
-    while (i < len(bow_vec)): 
-        word = bow_vec[i]
-        if word[0] == '#':
-            word = word[1:len(word)]
-            bow_vec[i] = word #remove hashtags
-        if re.match("^[a-zA-Z0-9_]*$", word):
-            i = i+1
-        else:
-            del bow_vec[i] #remove words with special characters
-    return bow_vec
-
 if __name__ == '__main__':
     from optparse import OptionParser
     import csv
@@ -422,7 +409,7 @@ if __name__ == '__main__':
                 text = tweet[1]
                 new_trans = text.lower().split(' ')
                 new_trans = [item for item in new_trans if item not in stop_words.ENGLISH_STOP_WORDS and item not in ['I'] and len(item)>0]
-                new_trans = filter_trans(new_trans)
+                new_trans = filter_bow(new_trans)
                 transactions.append(new_trans)
         results = find_frequent_itemsets(transactions, options.minsup, True)
         for itemset, support in results:
