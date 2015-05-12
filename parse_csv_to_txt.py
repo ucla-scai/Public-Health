@@ -1,6 +1,7 @@
 import sys
 import csv
 import re
+from Tools2 import filter_bow
 
 def filter_tweet_bow(bow_vec):
     i=0
@@ -18,8 +19,7 @@ def parse_csv_to_txt():
         hiv_reader = csv.reader(infile, delimiter=',')
         for row in hiv_reader:
             bow = row[1].lower().split(' ')
-            bow = filter_tweet_bow(bow)
-            print(bow)
+            bow = filter_bow(bow)
             fout.write(' '.join(bow) + '\n')
     fout.close()
                     
