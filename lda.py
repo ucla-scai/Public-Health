@@ -44,7 +44,7 @@ def test_dict_corpus(file_name):
         print(vector)
 
 def model_lda(file_name):
-    numtopic = 10
+    numtopic = 5
     stoplist = set('for a of the and to in he she i we they her his our their my your is are was were been u you lol'.split())
     dictionary = build_dictionary(file_name, stoplist)
     bow_corpus = MyCorpus(file_name, dictionary)
