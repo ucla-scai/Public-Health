@@ -50,7 +50,7 @@ def model_lda(file_name):
     bow_corpus = MyCorpus(file_name, dictionary)
     lda_model = models.ldamodel.LdaModel(bow_corpus, id2word=dictionary, num_topics=numtopic)
     #file = open("lda_"+file_name, "wb")
-    file = open("Data/lda_HIV_tweets.txt", "wb")
+    file = open("Data/lda_NON_HIV_tweets.txt", "wb")
     i = 0
     for i in range(numtopic):
         file.write(lda_model.print_topic(i, 10) + "\n")
