@@ -34,7 +34,6 @@ def build_dictionary(file_name, stop_list): #stop_list is a set of strings
     return dictionary
 
 def test_dict_corpus(file_name):
-    #stoplist = set('for a of the and to in he she i we her his is are was were been'.split())
     stoplist = set(stop_words.ENGLISH_STOP_WORDS)
     dictionary = build_dictionary(file_name, stoplist)
     print(dictionary)
@@ -44,18 +43,31 @@ def test_dict_corpus(file_name):
         print(vector)
 
 def model_lda(file_name):
-    numtopic = 5
-    stoplist = set('for a of the and to in he she i we they her his our their my your is are was were been u you lol'.split())
+    numtopic = 15
+    #stoplist = set('for a of the and to in he she i we they her his our their my your is are was were been u you lol'.split())
+    stoplist = set(stop_words.ENGLISH_STOP_WORDS)
+    stoplist.add("sex")
+    #stoplist.add("gay")
     dictionary = build_dictionary(file_name, stoplist)
+    #write_dictionary(dictionary)
+    
     bow_corpus = MyCorpus(file_name, dictionary)
-    lda_model = models.ldamodel.LdaModel(bow_corpus, id2word=dictionary, num_topics=numtopic)
+    lda_model = models.ldamodel.LdaModel(bow_corpus, id2word=dictionary, num_topics=numtopic, alpha="auto")
     #file = open("lda_"+file_name, "wb")
-    file = open("Data/lda_NON_HIV_tweets.txt", "wb")
+    file = open("Data/lda_HIV_tweets.txt", "wb")
     i = 0
     for i in range(numtopic):
         file.write(lda_model.print_topic(i, 10) + "\n")
     file.close()
-        
+
+def write_dictionary(dict):
+    #fout = open("Data/dictionary.txt", 'wb')
+    #for word in dict.items():
+    #    fout.write(word[1] + '\n')
+    #fout.close()
+    dict.save_as_text("Data/dictionary.txt", sort_by_word=False)
+    
+
 if __name__ == "__main__":
     if len(sys.argv)>1:
         model_lda(sys.argv[1])

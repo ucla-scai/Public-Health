@@ -26,7 +26,19 @@ def parse_csv_to_txt_non_HIV():
                 if len(bow) > 0:
                     fout.write(' '.join(bow) + '\n')
     fout.close()
+
+def parse_csv_to_txt_all_HIV():
+    fout = open('Data/ALL_HIV_tweets.txt', 'wb')
+    with open('Data/parsed_tweets.csv', 'rU') as infile:
+        hiv_reader = csv.reader(infile, delimiter=',')
+        for row in hiv_reader:
+            bow = row[1].lower().split(' ')
+            bow = filter_bow(bow)
+            if len(bow) > 0:
+                fout.write(' '.join(bow) + '\n')
+    fout.close()
                     
 if __name__ == "__main__":
+    parse_csv_to_txt_all_HIV()
     #parse_csv_to_txt_HIV()
-    parse_csv_to_txt_non_HIV()
+    #parse_csv_to_txt_non_HIV()
