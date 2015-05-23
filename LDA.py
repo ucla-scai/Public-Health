@@ -25,17 +25,18 @@ def filter_bow(bow_vec):
             del bow_vec[i] #remove words with special characters
     return bow_vec
 
-def build_dictionary(file_name, stop_list): #stop_list is a set of strings
+def build_dictionary(file_name, stop_set): #stop_set is a set of strings to ignore
     dictionary = corpora.Dictionary(filter_bow(line.lower().split()) for line in open(file_name))
-    stop_ids = [dictionary.token2id[stop_word] for stop_word in stop_list
+    stop_ids = [dictionary.token2id[stop_word] for stop_word in stop_set
                 if stop_word in dictionary.token2id]
     dictionary.filter_tokens(stop_ids) # remove stop words
     dictionary.compactify() # remove gaps in id sequence after words that were removed
     return dictionary
 
 def test_dict_corpus(file_name):
-    stoplist = set(stop_words.ENGLISH_STOP_WORDS)
-    dictionary = build_dictionary(file_name, stoplist)
+    #stoplist = set('for a of the and to in he she i we her his is are was were been'.split())
+    stopset = set(stop_words.ENGLISH_STOP_WORDS)
+    dictionary = build_dictionary(file_name, stopset)
     print(dictionary)
     print(dictionary.token2id)
     bow_corpus = MyCorpus(file_name, dictionary)
@@ -50,7 +51,6 @@ def model_lda(file_name):
     #stoplist.add("gay")
     dictionary = build_dictionary(file_name, stoplist)
     #write_dictionary(dictionary)
-    
     bow_corpus = MyCorpus(file_name, dictionary)
     lda_model = models.ldamodel.LdaModel(bow_corpus, id2word=dictionary, num_topics=numtopic, alpha="auto")
     #file = open("lda_"+file_name, "wb")

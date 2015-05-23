@@ -9,6 +9,7 @@ Basic usage of the module is very simple:
     >>> find_frequent_itemsets(transactions, minimum_support)
 """
 
+import csv
 import re
 from collections import defaultdict, namedtuple
 from itertools import imap
@@ -388,6 +389,33 @@ class FPNode(object):
             return "<%s (root)>" % type(self).__name__
         return "<%s %r (%r)>" % (type(self).__name__, self.item, self.count)
 
+def FIM_keyword_network(filePaths, dict, minsup, fimFilePath, maxLines):
+    fout = open(fimFilePath, 'wb')    
+    try:
+        transactions = []
+        for filePath in filePaths:
+            print("reading " + filePath + "...\n")
+            count = 0
+            fin = open(filePath)
+            file_rdr = csv.reader(fin, delimiter=' ')
+            for line_vec in file_rdr:
+                if count >= maxLines: #limit the number of lines to read per file
+                    break
+                line_vec = filter_bow(line_vec)
+                #use only the words in dictionary and not in stop list
+                line_vec = [elem for elem in line_vec if elem not in stop_words.ENGLISH_STOP_WORDS and dict.has_key(elem)==True]
+                transactions.append(line_vec)
+                count = count + 1
+            fin.close()
+        results = find_frequent_itemsets(transactions, minsup, True)
+        print("writing results...\n")
+        for itemset, support in results:
+            if len(itemset) == 2:
+                fout.write(','.join(itemset) + ' ' + str(support) + '\n')
+    finally:
+        fout.close()
+        print("Frequent ItemSet Mining Has Finished\n")
+
 if __name__ == '__main__':
     from optparse import OptionParser
     import csv
@@ -415,14 +443,11 @@ if __name__ == '__main__':
         for itemset, support in results:
             if len(itemset) > 1:
                 fout.write('{' + ', '.join(itemset) + '} ' + str(support) + '\n')
-                
+                 
     finally:
         fin.close()
         fout.close()
-    
-    #if len(args) < 1:
-    #    p.error('must provide the path to a CSV file to read')
-    #f = open(args[0])
+
     
 #     f = open('word_transaction.txt')
 #     try:
