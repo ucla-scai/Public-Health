@@ -3,6 +3,7 @@ from sklearn.feature_extraction import stop_words
 import csv
 from FIM import FIM_keyword_network
 from LDA import build_dictionary
+import igraph
 
 def buildDict(dict, filePath, maxLines):
     fin = open(filePath)
@@ -32,7 +33,7 @@ def writeDict(dict, fileDict):
         fout.write(str(key) + ' ' + str(val) + '\n')
     fout.close()
 
-def buildGraph(dict, fileFIM, fileGraph):
+def buildEdgeList(dict, fileFIM, fileGraph):
     fout = open(fileGraph, "wb")
     fin = open(fileFIM)
     
@@ -45,20 +46,25 @@ def buildGraph(dict, fileFIM, fileGraph):
         prob1to0 = tupleFreq/float(dict[wordTuple[1]])
         if prob1to0 > 1.0:
             prob1to0 = 1.0
-        fout.write(wordTuple[0] + ' ' + wordTuple[1] + ' ' + str(prob0to1) + '\n')
-        fout.write(wordTuple[1] + ' ' + wordTuple[0] + ' ' + str(prob1to0) + '\n')
+        if prob0to1 > 0.5:
+            fout.write(wordTuple[0] + ' ' + wordTuple[1] + ' ' + str(prob0to1) + '\n')
+        if prob1to0 > 0.5:
+            fout.write(wordTuple[1] + ' ' + wordTuple[0] + ' ' + str(prob1to0) + '\n')
     fin.close()
     fout.close()
 
 if __name__ == "__main__":
-    fileNames = ["#avengers_04302015-05102015_tweets.txt", "#ebola_05102014-05102015_tweets.txt", 
-             "#IOT_05102014-05102015_tweets.txt", "#maypac_03152015-05152015_tweets.txt"]
-#     fileNames = ["#avengers_04202015-04302015_tweets.txt"]
-    dir = "Data_VariousTopics"
+#     fileNames = ["#avengers_04302015-05102015_tweets.txt", "#ebola_05102014-05102015_tweets.txt", 
+#              "#IOT_05102014-05102015_tweets.txt", "#maypac_03152015-05152015_tweets.txt"]
+#     dir = "Data/VariousTopics"
+    
+    fileNames = ["3month-tweets.txt"]
+    dir = "Data/3month"
+    
     filePaths = []
-    fileFIM = "frequent_itemsets.txt"
-    fileDict = "dict.txt"
-    fileGraph = "graph.txt"
+    fileFIM = dir + '/' + "frequent_itemsets.txt"
+    fileDict = dir + '/' + "dict.txt"
+    fileGraph = dir + '/' + "edge_list.txt"
     maxLines = 60000
     
     #building dictionary
@@ -77,7 +83,7 @@ if __name__ == "__main__":
         
     #build graph
     print("Building a graph...")
-    buildGraph(dict, fileFIM, fileGraph)
+    buildEdgeList(dict, fileFIM, fileGraph)
     
     print("All Done\n")
 
