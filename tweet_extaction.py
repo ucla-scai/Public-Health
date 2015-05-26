@@ -44,7 +44,25 @@ def tweets_lang_filter(path):
 #           % (len(tweet_vec), lang_count * 100.0/(lang_count + len(tweet_vec)), lang_count + len(tweet_vec))
 #     return tweet_vec
 
+def merge():
+    fout = open("Data/VariousTopics/merged.txt", "wb")
+    fileNames = ["#avengers_04302015-05102015_tweets.txt", "#ebola_05102014-05102015_tweets.txt", 
+             "#IOT_05102014-05102015_tweets.txt", "#maypac_03152015-05152015_tweets.txt"]
+    dir = "Data/VariousTopics"
+    
+    for fileName in fileNames:
+        fin = open(dir + '/' + fileName)
+        count = 0
+        for line in fin:
+            if count >= 60000:
+                break
+            fout.write(line)
+            count = count + 1
+        fin.close()
+    fout.close()
+
 if __name__ == '__main__':
-    file_path = 'Data/3month/3month_tweets.txt'
-    tweets_lang_filter(file_path)
+    #file_path = 'Data/3month/3month_tweets.txt'
+    #tweets_lang_filter(file_path)
+    merge()
     

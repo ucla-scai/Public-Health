@@ -44,7 +44,7 @@ def test_dict_corpus(file_name):
         print(vector)
 
 def model_lda(file_name):
-    numtopic = 15
+    numtopic = 4
     #stoplist = set('for a of the and to in he she i we they her his our their my your is are was were been u you lol'.split())
     stoplist = set(stop_words.ENGLISH_STOP_WORDS)
     stoplist.add("sex")
@@ -54,10 +54,10 @@ def model_lda(file_name):
     bow_corpus = MyCorpus(file_name, dictionary)
     lda_model = models.ldamodel.LdaModel(bow_corpus, id2word=dictionary, num_topics=numtopic, alpha="auto")
     #file = open("lda_"+file_name, "wb")
-    file = open("Data/lda_HIV_tweets.txt", "wb")
+    file = open("Data/VariousTopics/lda.txt", "wb")
     i = 0
     for i in range(numtopic):
-        file.write(lda_model.print_topic(i, 10) + "\n")
+        file.write(lda_model.print_topic(i, 20) + "\n")
     file.close()
 
 def write_dictionary(dict):
