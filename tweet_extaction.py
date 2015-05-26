@@ -25,7 +25,8 @@ def tweets_lang_filter(path):
             if tweet["tweet"]["lang"] == "en":
                 lineVec = tweet["tweet"]["text"].split(' ')
                 filter_bow(lineVec)
-                fout.write(' '.join(lineVec) + '\n')
+                if len(lineVec) > 0:
+                    fout.write(' '.join(lineVec) + '\n')
 #                 fout.write(tweet["tweet"]["text"] + '\n')
 #                 print(tweet["tweet"]["text"])
     fout.close()

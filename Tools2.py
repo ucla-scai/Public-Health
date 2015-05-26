@@ -8,10 +8,13 @@ def filter_bow(bow_vec):
         if len(word)>0 and word[len(word)-1] == '\n':
             word = word[0:len(word)-1]
             bow_vec[i] = word #remove the new line character
-        if len(word)>0 and word[0] == '#':
-            word = word[1:len(word)]
-            bow_vec[i] = word #remove hashtags
-        if len(word)>0 and re.match("^[a-zA-Z0-9_]*$", word):
+#         if len(word)>0 and word[0] == '#':
+#             word = word[1:len(word)]
+#             bow_vec[i] = word #remove hashtags
+        if len(word)<3:
+            del bow_vec[i]
+            continue
+        if len(word)>0 and re.match("^[a-zA-Z0-9_#]*$", word): #allow pound sign
             i = i+1
         else:
             del bow_vec[i] #remove words with special characters
